@@ -99,6 +99,11 @@ const { hashPassword } = require('./auth-service');
       const match = await bcrypt.compare(password, user.password);
   
       if (match) {
+        req.session.user = {
+          user_id: user.user_id,
+          username: user.username
+        };
+
         res.json({ message: `Welcome ${user.username}!` });
       } else {
         res.status(401).json({ message: 'Invalid credentials' });
@@ -108,6 +113,20 @@ const { hashPassword } = require('./auth-service');
     }
   });
 
+
+
+  router.get('/logout', (req, res, next) => {
+    if (req.session && req.session.user) {
+      req.session.destroy(err => {
+        if (err) {
+          return next(err);
+        }
+        res.json({ message: 'Logged out' });
+      });
+    } else {
+      res.json({ message: 'No session' });
+    }
+  });
  
 // Don't forget to add the router to the `exports` object so it can be required in other modules
 module.exports = router;
