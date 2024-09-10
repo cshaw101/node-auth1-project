@@ -10,9 +10,9 @@ function find() {
 /**
   Resolves to an ARRAY with all users that match the filter condition
  */
-function findBy(filter) {
-  return db('users').select('user_id', 'username').where(filter);
-}
+  function findBy(filter) {
+    return db('users').select('user_id', 'username', 'password').where(filter);
+  }
 
 /**
   Resolves to the user { user_id, username } with the given user_id
@@ -26,12 +26,11 @@ function findById(user_id) {
  */
   function add(user) {
     return db('users')
-      .insert(user) // Insert the user into the database
+      .insert(user) 
       .then(() => {
-        // After insertion, retrieve the newly inserted user
         return db('users')
-          .where({ username: user.username }) // Adjust this condition if necessary
-          .first(); // Retrieve the first matching user
+          .where({ username: user.username })
+          .first(); 
       });
   }
 

@@ -1,7 +1,8 @@
-const router = require('express').Router()
-const Users = require('../users/users-model')
-const md = require('./auth-middleware')
-const { hashPassword } = require('./auth-service')
+const router = require('express').Router();
+const bcrypt = require('bcrypt');
+const Users = require('../users/users-model');
+const md = require('./auth-middleware');
+const { hashPassword } = require('./auth-service');
 // Require `checkUsernameFree`, `checkUsernameExists` and `checkPasswordLength`
 // middleware functions from `auth-middleware.js`. You will need them here!
 
@@ -28,15 +29,15 @@ const { hashPassword } = require('./auth-service')
     "message": "Password must be longer than 3 chars"
   }
  */
-  router.post('/register', md.checkUsernameFree, md.checkPasswordLength,  async (req, res, next) => { 
+  router.post('/register', md.checkUsernameFree, md.checkPasswordLength, async (req, res, next) => { 
     try {
       const { username, password } = req.body;
   
       if (!username || !password) {
         return res.status(400).json({ message: 'Username and password are required' });
       }
-
-      const hashedPassword = await hashPassword(password)
+  
+      const hashedPassword = await hashPassword(password);
   
       const newUser = {
         username: username,
@@ -84,9 +85,28 @@ const { hashPassword } = require('./auth-service')
     "message": "no session"
   }
  */
-  router.post('/login', (req, res) => {
-    res.json('auth logged in correctly')
-  })
+  router.post('/login', md.checkUsernameExists, async (req, res, next) => {
+    try {
+      const { username, password } = req.body;
+  
+      const user = await Users.findBy({ username }).first();
+  
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+  
+      // Ensure password and hashed password are passed correctly
+      const match = await bcrypt.compare(password, user.password);
+  
+      if (match) {
+        res.json({ message: `Welcome ${user.username}!` });
+      } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+      }
+    } catch (error) {
+      next(error); // Pass the error to the error handling middleware
+    }
+  });
 
  
 // Don't forget to add the router to the `exports` object so it can be required in other modules

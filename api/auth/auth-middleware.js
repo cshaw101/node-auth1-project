@@ -49,17 +49,19 @@ async function checkUsernameFree(req, res, next) {
   }
 */
 async function checkUsernameExists(req, res, next) {
-const { username } = req.body;
+  const { username } = req.body;
 
-const existingUsers = await Users.findBy({ username });
-try {
-  if (existingUsers.length === 0) {
-    return res.status(401).json({ "message": "Invalid credentials" })
+  try {
+    const existingUsers = await Users.findBy({ username });
+
+    if (existingUsers.length === 0) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    next();
+  } catch (err) {
+    next(err);
   }
-  next()
-}catch(err) {
-next(err)
-}
 }
 
 /*
@@ -71,12 +73,13 @@ next(err)
   }
 */
 async function checkPasswordLength(req, res, next) {
-const { password } = req.body;
+  const { password } = req.body;
 
-if (!password || password.length <= 3) {
-  return res.status(422).json({ message: "Password must be longer than 3 chars"  })
-}
-next()
+  if (!password || password.length <= 3) {
+    return res.status(422).json({ message: "Password must be longer than 3 chars" });
+  }
+
+  next();
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
