@@ -62,6 +62,9 @@ router.post('/register', (req, res) => {
     "message": "no session"
   }
  */
+  router.post('/login', (req, res) => {
+    res.json('auth logged in correctly')
+  })
 
  
 // Don't forget to add the router to the `exports` object so it can be required in other modules
