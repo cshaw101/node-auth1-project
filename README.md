@@ -64,3 +64,10 @@ The database `auth.db3` includes a single `users` table:
 ### Task 3: Stretch Goals
 
 - Build a React application that implements components to register, login and view a list of users. Gotta keep sharpening your React skills.
+
+
+//todo next
+
+- complete model and test them
+- complete routers
+-complete middleware

@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const Users = require('../users/users-model')
 // Require `checkUsernameFree`, `checkUsernameExists` and `checkPasswordLength`
 // middleware functions from `auth-middleware.js`. You will need them here!
 
@@ -25,9 +26,30 @@ const router = require('express').Router()
     "message": "Password must be longer than 3 chars"
   }
  */
-router.post('/register', (req, res) => {
-  res.json('auth registered correctly')
-})
+  router.post('/register', async (req, res, next) => { // Added 'async' keyword here
+    try {
+      const { username, password } = req.body;
+  
+      if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+      }
+  
+  
+  
+      const newUser = {
+        username: username,
+        password: password
+      };
+  
+      // Save the user to the database
+      const savedUser = await Users.add(newUser); // Assuming add() resolves to { user_id, username }
+  
+      // Return the newly created user (excluding password)
+      res.status(201).json(savedUser);
+    } catch (error) {
+      next(error); // Forward errors to the error handler
+    }
+  });
 
 
 /**
